@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import { create, SocketState } from '@wppconnect-team/wppconnect';
-import { Request } from 'express';
 
 import { download } from '../controller/sessionController';
+import { Request } from '../types/Request';
 import { WhatsAppServer } from '../types/WhatsAppServer';
 import chatWootClient from './chatWootClient';
 import { callWebHook, startHelper } from './functions';
@@ -68,12 +68,8 @@ export default class CreateSessionUtil {
           req.serverOptions.createOptions,
           {
             session: session,
-            deviceName:
-              client.config?.deviceName || req.serverOptions.deviceName,
-            poweredBy:
-              client.config?.poweredBy ||
-              req.serverOptions.poweredBy ||
-              'WPPConnect-Server',
+            deviceName: req.serverOptions.deviceName,
+            poweredBy: req.serverOptions.poweredBy || 'WPPConnect-Server',
             catchQR: (
               base64Qr: any,
               asciiQR: any,
@@ -129,9 +125,6 @@ export default class CreateSessionUtil {
 
       if (req.serverOptions.webhook.onPollResponse) {
         await this.onPollResponse(client, req);
-      }
-      if (req.serverOptions.webhook.onLabelUpdated) {
-        await this.onLabelUpdated(client, req);
       }
     } catch (e) {
       req.logger.error(e);
@@ -233,8 +226,6 @@ export default class CreateSessionUtil {
       }
 
       req.io.emit('received-message', { response: message });
-      if (req.serverOptions.webhook.onSelfMessage && message.fromMe)
-        callWebHook(client, req, 'onselfmessage', message);
     });
 
     await client.onIncomingCall(async (call) => {
@@ -279,13 +270,6 @@ export default class CreateSessionUtil {
       callWebHook(client, req, 'onpollresponse', response);
     });
   }
-  async onLabelUpdated(client: WhatsAppServer, req: Request) {
-    await client.isConnected();
-    await client.onUpdateLabel(async (response: any) => {
-      req.io.emit('onupdatelabel', response);
-      callWebHook(client, req, 'onupdatelabel', response);
-    });
-  }
 
   encodeFunction(data: any, webhook: any) {
     data.webhook = webhook;
@@ -300,13 +284,13 @@ export default class CreateSessionUtil {
   }
 
   getClient(session: any) {
-    let client = clientsArray[session];
+    let client = clientsArray[session] as any;
 
     if (!client)
-      client = clientsArray[session] = {
+      client = (clientsArray as any)[session] = {
         status: null,
         session: session,
-      } as any;
+      };
     return client;
   }
 }

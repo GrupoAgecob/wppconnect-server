@@ -4,12 +4,12 @@ export default {
   port: '21465',
   deviceName: 'WppConnect',
   poweredBy: 'WPPConnect-Server',
-  startAllSession: true,
+  startAllSession: false,
   tokenStoreType: 'file',
-  maxListeners: 15,
+  maxListeners: 0,
   customUserDataDir: './userDataDir/',
   webhook: {
-    url: null,
+    url: 'http://192.168.4.11:57609/webhook/get/file/json',
     autoDownload: true,
     uploadS3: false,
     readMessage: true,
@@ -20,12 +20,6 @@ export default {
     onReactionMessage: true,
     onPollResponse: true,
     onRevokedMessage: true,
-    onLabelUpdated: true,
-    onSelfMessage: false,
-  },
-  chatwoot: {
-    sendQrCode: true,
-    sendStatus: true,
   },
   archive: {
     enable: false,
@@ -79,11 +73,5 @@ export default {
     redisPassword: '',
     redisDb: 0,
     redisPrefix: 'docker',
-  },
-  aws_s3: {
-    region: 'sa-east-1',
-    access_key_id: null,
-    secret_key: null,
-    defaultBucketName: null,
   },
 };

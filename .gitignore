@@ -15,11 +15,7 @@
 /package-lock.json
 *.png
 *.tgz
-*.zip
 /.idea
 userDataDir
 /yarn.lock
 /yarn-error.log
-backupFolder
-tokens/*
-wppconnect_tokens/*

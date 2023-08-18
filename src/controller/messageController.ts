@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Response } from 'express';
 
-import { Request, Response } from 'express';
-
+import { Request } from '../types/Request';
 import { unlinkAsync } from '../util/functions';
 
 function returnError(req: Request, res: Response, error: any) {
@@ -31,41 +31,7 @@ async function returnSucess(res: any, data: any) {
   res.status(201).json({ status: 'success', response: data, mapper: 'return' });
 }
 
-export async function sendMessage(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-        required: true,
-        "@content": {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: {
-                $phone: { type: "string" },
-                $isGroup: { type: "boolean" },
-                $message: { type: "string" }
-              }
-            },
-            examples: {
-              "Default": {
-                value: {
-                  phone: '5521999999999',
-                  isGroup: false,
-                  message: 'Hello, welcome to WPPConnect'
-                },
-              },
-            },
-          }
-        }
-      }
-   */
+export async function sendMessage(req: Request, res: any) {
   const { phone, message } = req.body;
 
   const options = req.body.options || {};
@@ -85,65 +51,24 @@ export async function sendMessage(req: Request, res: Response) {
   }
 }
 
-export async function sendFile(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-            schema: {
-                type: "object",
-                properties: {
-                    "phone": { type: "string" },
-                    "isGroup": { type: "boolean" },
-                    "filename": { type: "string" },
-                    "caption": { type: "string" },
-                    "base64": { type: "string" }
-                }
-            },
-            examples: {
-                "Default": {
-                    value: {
-                        "phone": "5521999999999",
-                        "isGroup": false,
-                        "filename": "file name lol",
-                        "caption": "caption for my file",
-                        "base64": "<base64> string"
-                    }
-                }
-            }
-        }
-      }
-    }
-   */
+export async function sendFile(req: Request, res: any) {
   const { phone, path, base64, filename = 'file', message, caption } = req.body;
-
-  const options = req.body.options || {};
 
   if (!path && !req.file && !base64)
     return res.status(401).send({
       message: 'Sending the file is mandatory',
     });
 
-  const pathFile = path || base64 || req.file?.path;
+  const pathFile = path || base64 || req.file.path;
   const msg = message || caption;
 
   try {
     const results: any = [];
-    for (const contact of phone) {
+    for (const contato of phone) {
       results.push(
-        await req.client.sendFile(contact, pathFile, {
+        await req.client.sendFile(contato, pathFile, {
           filename: filename,
           caption: msg,
-          ...options,
         })
       );
     }
@@ -157,43 +82,7 @@ export async function sendFile(req: Request, res: Response) {
   }
 }
 
-export async function sendVoice(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-        required: true,
-        "@content": {
-            "application/json": {
-                schema: {
-                    type: "object",
-                    properties: {
-                        "phone": { type: "string" },
-                        "isGroup": { type: "boolean" },
-                        "path": { type: "string" },
-                        "quotedMessageId": { type: "string" }
-                    }
-                },
-                examples: {
-                    "Default": {
-                        value: {
-                            "phone": "5521999999999",
-                            "isGroup": false,
-                            "path": "<path_file>",
-                            "quotedMessageId": "message Id"
-                        }
-                    }
-                }
-            }
-        }
-    }
-   */
+export async function sendVoice(req: Request, res: any) {
   const {
     phone,
     path,
@@ -224,41 +113,7 @@ export async function sendVoice(req: Request, res: Response) {
   }
 }
 
-export async function sendVoice64(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-        required: true,
-        "@content": {
-            "application/json": {
-                schema: {
-                    type: "object",
-                    properties: {
-                        "phone": { type: "string" },
-                        "isGroup": { type: "boolean" },
-                        "base64Ptt": { type: "string" }
-                    }
-                },
-                examples: {
-                    "Default": {
-                        value: {
-                            "phone": "5521999999999",
-                            "isGroup": false,
-                            "base64Ptt": "<base64_string>"
-                        }
-                    }
-                }
-            }
-        }
-    }
-   */
+export async function sendVoice64(req: Request, res: any) {
   const { phone, base64Ptt } = req.body;
 
   try {
@@ -277,43 +132,7 @@ export async function sendVoice64(req: Request, res: Response) {
   }
 }
 
-export async function sendLinkPreview(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-        required: true,
-        "@content": {
-            "application/json": {
-                schema: {
-                    type: "object",
-                    properties: {
-                        "phone": { type: "string" },
-                        "isGroup": { type: "boolean" },
-                        "url": { type: "string" },
-                        "caption": { type: "string" }
-                    }
-                },
-                examples: {
-                    "Default": {
-                        value: {
-                            "phone": "5521999999999",
-                            "isGroup": false,
-                            "url": "http://www.link.com",
-                            "caption": "Text for describe link"
-                        }
-                    }
-                }
-            }
-        }
-    }
-   */
+export async function sendLinkPreview(req: Request, res: any) {
   const { phone, url, caption } = req.body;
 
   try {
@@ -332,47 +151,7 @@ export async function sendLinkPreview(req: Request, res: Response) {
   }
 }
 
-export async function sendLocation(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-        required: true,
-        "@content": {
-            "application/json": {
-                schema: {
-                    type: "object",
-                    properties: {
-                        "phone": { type: "string" },
-                        "isGroup": { type: "boolean" },
-                        "lat": { type: "string" },
-                        "lng": { type: "string" },
-                        "title": { type: "string" },
-                        "address": { type: "string" }
-                    }
-                },
-                examples: {
-                    "Default": {
-                        value: {
-                            "phone": "5521999999999",
-                            "isGroup": false,
-                            "lat": "-89898322",
-                            "lng": "-545454",
-                            "title": "Rio de Janeiro",
-                            "address": "Av. N. S. de Copacabana, 25, Copacabana"
-                        }
-                    }
-                }
-            }
-        }
-    }
-   */
+export async function sendLocation(req: Request, res: any) {
   const { phone, lat, lng, title, address } = req.body;
 
   try {
@@ -396,18 +175,7 @@ export async function sendLocation(req: Request, res: Response) {
   }
 }
 
-export async function sendButtons(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA',
-     }
-     #swagger.deprecated=true
-   */
+export async function sendButtons(req: Request, res: any) {
   const { phone, message, options } = req.body;
 
   try {
@@ -426,18 +194,7 @@ export async function sendButtons(req: Request, res: Response) {
   }
 }
 
-export async function sendListMessage(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA',
-     }
-     #swagger.deprecated=true
-   */
+export async function sendListMessage(req: Request, res: any) {
   const {
     phone,
     description = '',
@@ -467,47 +224,7 @@ export async function sendListMessage(req: Request, res: Response) {
   }
 }
 
-export async function sendPollMessage(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-    #swagger.requestBody = {
-        required: true,
-        "@content": {
-            "application/json": {
-                schema: {
-                    type: "object",
-                    properties: {
-                        phone: { type: "string" },
-                        isGroup: { type: "boolean" },
-                        name: { type: "string" },
-                        choices: { type: "array" },
-                        options: { type: "object" },
-                    }
-                },
-                examples: {
-                    "Default": {
-                        value: {
-                          phone: '5521999999999',
-                          isGroup: false,
-                          name: 'Poll name',
-                          choices: ['Option 1', 'Option 2', 'Option 3'],
-                          options: {
-                            selectableCount: 1,
-                          }
-                        }
-                    },
-                }
-            }
-        }
-    }
-   */
+export async function sendPollMessage(req: Request, res: any) {
   const { phone, name, choices, options } = req.body;
 
   try {
@@ -528,44 +245,7 @@ export async function sendPollMessage(req: Request, res: Response) {
   }
 }
 
-export async function sendStatusText(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: true,
-      content: {
-        'application/json': {
-          schema: {
-            type: 'object',
-            properties: {
-              phone: { type: 'string' },
-              isGroup: { type: 'boolean' },
-              message: { type: 'string' },
-              messageId: { type: 'string' }
-            },
-            required: ['phone', 'isGroup', 'message']
-          },
-          examples: {
-            Default: {
-              value: {
-                phone: '5521999999999',
-                isGroup: false,
-                message: 'Reply to message',
-                messageId: '<id_message>'
-              }
-            }
-          }
-        }
-      }
-    }
-   */
+export async function sendStatusText(req: Request, res: any) {
   const { message } = req.body;
 
   try {
@@ -580,43 +260,7 @@ export async function sendStatusText(req: Request, res: Response) {
   }
 }
 
-export async function replyMessage(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              "phone": { type: "string" },
-              "isGroup": { type: "boolean" },
-              "message": { type: "string" },
-              "messageId": { type: "string" }
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                "phone": "5521999999999",
-                "isGroup": false,
-                "message": "Reply to message",
-                "messageId": "<id_message>"
-              }
-            }
-          }
-        }
-      }
-    }
-   */
+export async function replyMessage(req: Request, res: any) {
   const { phone, message, messageId } = req.body;
 
   try {
@@ -634,44 +278,7 @@ export async function replyMessage(req: Request, res: Response) {
   }
 }
 
-export async function sendMentioned(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-  required: true,
-  "@content": {
-    "application/json": {
-      schema: {
-        type: "object",
-        properties: {
-          "phone": { type: "string" },
-          "isGroup": { type: "boolean" },
-          "message": { type: "string" },
-          "mentioned": { type: "array", items: { type: "string" } }
-        },
-        required: ["phone", "message", "mentioned"]
-      },
-      examples: {
-        "Default": {
-          value: {
-            "phone": "5521999999999",
-            "isGroup": true,
-            "message": "Your text message",
-            "mentioned": ["@556593077171@c.us"]
-          }
-        }
-      }
-    }
-  }
-}
-   */
+export async function sendMentioned(req: Request, res: any) {
   const { phone, message, mentioned } = req.body;
 
   try {
@@ -694,42 +301,7 @@ export async function sendMentioned(req: Request, res: Response) {
     });
   }
 }
-export async function sendImageAsSticker(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              "phone": { type: "string" },
-              "isGroup": { type: "boolean" },
-              "path": { type: "string" }
-            },
-            required: ["phone", "path"]
-          },
-          examples: {
-            "Default": {
-              value: {
-                "phone": "5521999999999",
-                "isGroup": true,
-                "path": "<path_file>"
-              }
-            }
-          }
-        }
-      }
-    }
-   */
+export async function sendImageAsSticker(req: Request, res: any) {
   const { phone, path } = req.body;
 
   if (!path && !req.file)
@@ -737,7 +309,7 @@ export async function sendImageAsSticker(req: Request, res: Response) {
       message: 'Sending the file is mandatory',
     });
 
-  const pathFile = path || req.file?.path;
+  const pathFile = path || req.file.path;
 
   try {
     const results: any = [];
@@ -753,42 +325,7 @@ export async function sendImageAsSticker(req: Request, res: Response) {
     returnError(req, res, error);
   }
 }
-export async function sendImageAsStickerGif(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: true,
-      content: {
-        'application/json': {
-          schema: {
-            type: 'object',
-            properties: {
-              phone: { type: 'string' },
-              isGroup: { type: 'boolean' },
-              path: { type: 'string' },
-            },
-            required: ['phone', 'path'],
-          },
-          examples: {
-            'Default': {
-              value: {
-                phone: '5521999999999',
-                isGroup: true,
-                path: '<path_file>',
-              },
-            },
-          },
-        },
-      },
-    }
-   */
+export async function sendImageAsStickerGif(req: Request, res: any) {
   const { phone, path } = req.body;
 
   if (!path && !req.file)
@@ -796,7 +333,7 @@ export async function sendImageAsStickerGif(req: Request, res: Response) {
       message: 'Sending the file is mandatory',
     });
 
-  const pathFile = path || req.file?.path;
+  const pathFile = path || req.file.path;
 
   try {
     const results: any = [];

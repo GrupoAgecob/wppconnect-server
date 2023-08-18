@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 import { Chat } from '@wppconnect-team/wppconnect';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
+import { Request } from '../types/Request';
 import { contactToArray, unlinkAsync } from '../util/functions';
 import { clientsArray } from '../util/sessionUtil';
 
@@ -43,37 +44,7 @@ function returnError(req: Request, res: Response, session: any, error: any) {
   });
 }
 
-export async function setProfileName(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Profile"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: false,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              name: { type: "string" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                name: "My new name",
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function setProfileName(req: Request, res: any) {
   const { name } = req.body;
 
   if (!name)
@@ -94,17 +65,7 @@ export async function setProfileName(req: Request, res: Response) {
   }
 }
 
-export async function showAllContacts(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Contacts"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-   */
+export async function showAllContacts(req: Request, res: any) {
   try {
     const contacts = await req.client.getAllContacts();
     res.status(200).json({ status: 'success', response: contacts });
@@ -118,19 +79,7 @@ export async function showAllContacts(req: Request, res: Response) {
   }
 }
 
-export async function getAllChats(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Chat"]
-   * #swagger.summary = 'Deprecated in favor of 'list-chats'
-   * #swagger.deprecated = true
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-   */
+export async function getAllChats(req: Request, res: any) {
   try {
     const response = await req.client.getAllChats();
     return res
@@ -144,114 +93,7 @@ export async function getAllChats(req: Request, res: Response) {
   }
 }
 
-export async function listChats(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Chat"]
-   * #swagger.summary = 'Retrieve a list of chats'
-   * #swagger.description = 'This body is not required. Not sent body to get all chats or filter.'
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: false,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              id: { type: "string" },
-              count: { type: "number" },
-              direction: { type: "string" },
-              onlyGroups: { type: "boolean" },
-              onlyUsers: { type: "boolean" },
-              onlyWithUnreadMessage: { type: "boolean" },
-              withLabels: { type: "array" },
-            }
-          },
-          examples: {
-            "All options - Edit this": {
-              value: {
-                id: "<chatId>",
-                count: 20,
-                direction: "after",
-                onlyGroups: false,
-                onlyUsers: false,
-                onlyWithUnreadMessage: false,
-                withLabels: []
-              }
-            },
-            "All chats": {
-              value: {
-              }
-            },
-            "Chats group": {
-              value: {
-                onlyGroups: true,
-              }
-            },
-            "Only with unread messages": {
-              value: {
-                onlyWithUnreadMessage: false,
-              }
-            },
-            "Paginated results": {
-              value: {
-                id: "<chatId>",
-                count: 20,
-                direction: "after",
-              }
-            },
-          }
-        }
-      }
-     }
-   */
-  try {
-    const {
-      id,
-      count,
-      direction,
-      onlyGroups,
-      onlyUsers,
-      onlyWithUnreadMessage,
-      withLabels,
-    } = req.body;
-
-    const response = await req.client.listChats({
-      id: id,
-      count: count,
-      direction: direction,
-      onlyGroups: onlyGroups,
-      onlyUsers: onlyUsers,
-      onlyWithUnreadMessage: onlyWithUnreadMessage,
-      withLabels: withLabels,
-    });
-
-    return res.status(200).json(response);
-  } catch (e) {
-    req.logger.error(e);
-    return res
-      .status(500)
-      .json({ status: 'error', message: 'Error on get all chats' });
-  }
-}
-
-export async function getAllChatsWithMessages(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Chat"]
-   * #swagger.summary = 'Deprecated in favor of list-chats'
-   * #swagger.deprecated = true
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-   */
+export async function getAllChatsWithMessages(req: Request, res: any) {
   try {
     const response = await req.client.getAllChatsWithMessages();
     return res.status(200).json({ status: 'success', response: response });
@@ -267,29 +109,7 @@ export async function getAllChatsWithMessages(req: Request, res: Response) {
 /**
  * Depreciado em favor de getMessages
  */
-export async function getAllMessagesInChat(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["phone"] = {
-      schema: '5521999999999'
-     }
-     #swagger.parameters["isGroup"] = {
-      schema: 'false'
-     }
-     #swagger.parameters["includeMe"] = {
-      schema: 'true'
-     }
-     #swagger.parameters["includeNotifications"] = {
-      schema: 'true'
-     }
-   */
+export async function getAllMessagesInChat(req: Request, res: any) {
   try {
     const { phone } = req.params;
     const {
@@ -318,17 +138,7 @@ export async function getAllMessagesInChat(req: Request, res: Response) {
   }
 }
 
-export async function getAllNewMessages(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-   */
+export async function getAllNewMessages(req: Request, res: any) {
   try {
     const response = await req.client.getAllNewMessages();
     return res.status(200).json({ status: 'success', response: response });
@@ -342,17 +152,7 @@ export async function getAllNewMessages(req: Request, res: Response) {
   }
 }
 
-export async function getAllUnreadMessages(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-   */
+export async function getAllUnreadMessages(req: Request, res: any) {
   try {
     const response = await req.client.getAllUnreadMessages();
     return res.status(200).json({ status: 'success', response: response });
@@ -366,23 +166,7 @@ export async function getAllUnreadMessages(req: Request, res: Response) {
   }
 }
 
-export async function getChatById(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["phone"] = {
-      schema: '5521999999999'
-     }
-     #swagger.parameters["isGroup"] = {
-      schema: 'false'
-     }
-   */
+export async function getChatById(req: Request, res: any) {
   const { phone } = req.params;
   const { isGroup } = req.query;
 
@@ -405,21 +189,7 @@ export async function getChatById(req: Request, res: Response) {
   }
 }
 
-export async function getMessageById(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["messageId"] = {
-      required: true,
-      schema: '<message_id>'
-     }
-   */
+export async function getMessageById(req: Request, res: any) {
   const session = req.session;
   const { messageId } = req.params;
 
@@ -432,17 +202,7 @@ export async function getMessageById(req: Request, res: Response) {
   }
 }
 
-export async function getBatteryLevel(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Misc"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-   */
+export async function getBatteryLevel(req: Request, res: any) {
   try {
     const response = await req.client.getBatteryLevel();
     return res.status(200).json({ status: 'Success', response: response });
@@ -456,17 +216,7 @@ export async function getBatteryLevel(req: Request, res: Response) {
   }
 }
 
-export async function getHostDevice(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Misc"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-   */
+export async function getHostDevice(req: Request, res: any) {
   try {
     const response = await req.client.getHostDevice();
     const phoneNumber = await req.client.getWid();
@@ -485,17 +235,7 @@ export async function getHostDevice(req: Request, res: Response) {
   }
 }
 
-export async function getPhoneNumber(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Misc"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-   */
+export async function getPhoneNumber(req: Request, res: any) {
   try {
     const phoneNumber = await req.client.getWid();
     return res
@@ -511,17 +251,7 @@ export async function getPhoneNumber(req: Request, res: Response) {
   }
 }
 
-export async function getBlockList(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Misc"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-   */
+export async function getBlockList(req: Request, res: any) {
   const response = await req.client.getBlockList();
 
   try {
@@ -540,39 +270,7 @@ export async function getBlockList(req: Request, res: Response) {
   }
 }
 
-export async function deleteChat(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: false,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              phone: { type: "string" },
-              isGroup: { type: "boolean" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                phone: "5521999999999",
-                isGroup: false,
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function deleteChat(req: Request, res: any) {
   const { phone } = req.body;
   const session = req.session;
 
@@ -586,17 +284,7 @@ export async function deleteChat(req: Request, res: Response) {
     returnError(req, res, session, error);
   }
 }
-export async function deleteAllChats(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-   */
+export async function deleteAllChats(req: Request, res: any) {
   try {
     const chats = await req.client.getAllChats();
     for (const chat of chats) {
@@ -613,40 +301,7 @@ export async function deleteAllChats(req: Request, res: Response) {
   }
 }
 
-export async function clearChat(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     
-     #swagger.requestBody = {
-      required: false,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              phone: { type: "string" },
-              isGroup: { type: "boolean" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                phone: "5521999999999",
-                isGroup: false,
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function clearChat(req: Request, res: any) {
   const { phone } = req.body;
   const session = req.session;
 
@@ -661,17 +316,7 @@ export async function clearChat(req: Request, res: Response) {
   }
 }
 
-export async function clearAllChats(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-   */
+export async function clearAllChats(req: Request, res: any) {
   try {
     const chats = await req.client.getAllChats();
     for (const chat of chats) {
@@ -686,42 +331,7 @@ export async function clearAllChats(req: Request, res: Response) {
   }
 }
 
-export async function archiveChat(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     
-     #swagger.requestBody = {
-      required: false,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              phone: { type: "string" },
-              isGroup: { type: "boolean" },
-              value: { type: "boolean" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                phone: "5521999999999",
-                isGroup: false,
-                value: true,
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function archiveChat(req: Request, res: any) {
   const { phone, value = true } = req.body;
 
   try {
@@ -735,17 +345,7 @@ export async function archiveChat(req: Request, res: Response) {
   }
 }
 
-export async function archiveAllChats(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-   */
+export async function archiveAllChats(req: Request, res: any) {
   try {
     const chats = await req.client.getAllChats();
     for (const chat of chats) {
@@ -762,72 +362,7 @@ export async function archiveAllChats(req: Request, res: Response) {
   }
 }
 
-export async function getAllChatsArchiveds(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Chat"]
-   * #swagger.description = 'Retrieves all archived chats.'
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-   */
-  try {
-    const chats = await req.client.getAllChats();
-    const archived = [] as any;
-    for (const chat of chats) {
-      if (chat.archive === true) {
-        archived.push(chat);
-      }
-    }
-    return res.status(201).json(archived);
-  } catch (e) {
-    req.logger.error(e);
-    return res.status(500).json({
-      status: 'error',
-      message: 'Error on archive all chats',
-      error: e,
-    });
-  }
-}
-export async function deleteMessage(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     
-     #swagger.requestBody = {
-      required: false,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              phone: { type: "string" },
-              isGroup: { type: "boolean" },
-              messageId: { type: "string" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                phone: "5521999999999",
-                isGroup: false,
-                messageId: "<messageId>",
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function deleteMessage(req: Request, res: any) {
   const { phone, messageId } = req.body;
 
   try {
@@ -843,39 +378,7 @@ export async function deleteMessage(req: Request, res: Response) {
       .json({ status: 'error', message: 'Error on delete message', error: e });
   }
 }
-export async function reactMessage(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: false,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              messageId: { type: "string" },
-              reaction: { type: "string" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                messageId: "<messageId>",
-                reaction: "😜",
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function reactMessage(req: Request, res: any) {
   const { msgId, reaction } = req.body;
 
   try {
@@ -894,44 +397,7 @@ export async function reactMessage(req: Request, res: Response) {
   }
 }
 
-export async function reply(req: Request, res: Response) {
-  /**
-   * #swagger.deprecated=true
-     #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              phone: { type: "string" },
-              isGroup: { type: "boolean" },
-              messageid: { type: "string" },
-              text: { type: "string" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-              phone: "5521999999999",
-              isGroup: false,
-              messageid: "<messageId>",
-              text: "Text to reply",
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function reply(req: Request, res: any) {
   const { phone, text, messageid } = req.body;
 
   try {
@@ -945,41 +411,7 @@ export async function reply(req: Request, res: Response) {
   }
 }
 
-export async function forwardMessages(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              phone: { type: "string" },
-              isGroup: { type: "boolean" },
-              messageid: { type: "string" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                phone: "5521999999999",
-                isGroup: false,
-                messageid: "<messageId>",
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function forwardMessages(req: Request, res: any) {
   const { phone, messageId, isGroup = false } = req.body;
 
   try {
@@ -1008,39 +440,7 @@ export async function forwardMessages(req: Request, res: Response) {
   }
 }
 
-export async function markUnseenMessage(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              phone: { type: "string" },
-              isGroup: { type: "boolean" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                phone: "5521999999999",
-                isGroup: false,
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function markUnseenMessage(req: Request, res: any) {
   const { phone } = req.body;
 
   try {
@@ -1056,39 +456,7 @@ export async function markUnseenMessage(req: Request, res: Response) {
   }
 }
 
-export async function blockContact(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Misc"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              phone: { type: "string" },
-              isGroup: { type: "boolean" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-              phone: "5521999999999",
-              isGroup: false,
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function blockContact(req: Request, res: any) {
   const { phone } = req.body;
 
   try {
@@ -1104,39 +472,7 @@ export async function blockContact(req: Request, res: Response) {
   }
 }
 
-export async function unblockContact(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Misc"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              phone: { type: "string" },
-              isGroup: { type: "boolean" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-              phone: "5521999999999",
-              isGroup: false,
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function unblockContact(req: Request, res: any) {
   const { phone } = req.body;
 
   try {
@@ -1152,48 +488,7 @@ export async function unblockContact(req: Request, res: Response) {
   }
 }
 
-export async function pinChat(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["obj"] = {
-      in: 'body',
-      schema: {
-        $phone: '5521999999999',
-        $isGroup: false,
-        $state: true,
-      }
-     }
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              phone: { type: "string" },
-              isGroup: { type: "boolean" },
-              state: { type: "boolean" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-              phone: "5521999999999",
-              state: true,
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function pinChat(req: Request, res: any) {
   const { phone, state } = req.body;
 
   try {
@@ -1214,23 +509,7 @@ export async function pinChat(req: Request, res: Response) {
   }
 }
 
-export async function setProfilePic(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Profile"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.consumes = ['multipart/form-data']  
-      #swagger.parameters['file'] = {
-          in: 'formData',
-          type: 'file',
-          required: 'true',
-      }
-   */
+export async function setProfilePic(req: Request, res: any) {
   if (!req.file)
     return res
       .status(400)
@@ -1256,18 +535,7 @@ export async function setProfilePic(req: Request, res: Response) {
   }
 }
 
-export async function getUnreadMessages(req: Request, res: Response) {
-  /**
-     #swagger.deprecated=true
-     #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-   */
+export async function getUnreadMessages(req: Request, res: any) {
   try {
     const response = await req.client.getUnreadMessages(false, false, true);
     return res.status(200).json({ status: 'success', response: response });
@@ -1279,20 +547,7 @@ export async function getUnreadMessages(req: Request, res: Response) {
   }
 }
 
-export async function getChatIsOnline(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["phone"] = {
-      schema: '5521999999999',
-     }
-   */
+export async function getChatIsOnline(req: Request, res: any) {
   const { phone } = req.params;
   try {
     const response = await req.client.getChatIsOnline(`${phone}@c.us`);
@@ -1307,20 +562,7 @@ export async function getChatIsOnline(req: Request, res: Response) {
   }
 }
 
-export async function getLastSeen(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["phone"] = {
-      schema: '5521999999999',
-     }
-   */
+export async function getLastSeen(req: Request, res: any) {
   const { phone } = req.params;
   try {
     const response = await req.client.getLastSeen(`${phone}@c.us`);
@@ -1336,20 +578,7 @@ export async function getLastSeen(req: Request, res: Response) {
   }
 }
 
-export async function getListMutes(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["type"] = {
-      schema: 'all',
-     }
-   */
+export async function getListMutes(req: Request, res: any) {
   const { type = 'all' } = req.params;
   try {
     const response = await req.client.getListMutes(type);
@@ -1365,27 +594,7 @@ export async function getListMutes(req: Request, res: Response) {
   }
 }
 
-export async function loadAndGetAllMessagesInChat(req: Request, res: Response) {
-  /**
-     #swagger.deprecated=true
-     #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["phone"] = {
-      schema: '5521999999999'
-     }
-     #swagger.parameters["includeMe"] = {
-      schema: 'true'
-     }
-     #swagger.parameters["includeNotifications"] = {
-      schema: 'false'
-     }
-   */
+export async function loadAndGetAllMessagesInChat(req: Request, res: any) {
   const { phone, includeMe = true, includeNotifications = false } = req.params;
   try {
     const response = await req.client.loadAndGetAllMessagesInChat(
@@ -1402,29 +611,7 @@ export async function loadAndGetAllMessagesInChat(req: Request, res: Response) {
       .json({ status: 'error', response: 'Error on open list', error: error });
   }
 }
-export async function getMessages(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["phone"] = {
-      schema: '5521999999999@c.us'
-     }
-     #swagger.parameters["count"] = {
-      schema: '20'
-     }
-     #swagger.parameters["direction"] = {
-      schema: 'before'
-     }
-     #swagger.parameters["id"] = {
-      schema: '<message_id_to_use_direction>'
-     }
-   */
+export async function getMessages(req: Request, res: any) {
   const { phone } = req.params;
   const { count = 20, direction = 'before', id = null } = req.query;
   try {
@@ -1442,43 +629,7 @@ export async function getMessages(req: Request, res: Response) {
   }
 }
 
-export async function sendContactVcard(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              phone: { type: "string" },
-              isGroup: { type: "boolean" },
-              name: { type: "string" },
-              contactsId: { type: "array" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                phone: "5521999999999",
-                isGroup: false,
-                name: 'Name of contact',
-                contactsId: ['5521999999999'],
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function sendContactVcard(req: Request, res: any) {
   const { phone, contactsId, name = null, isGroup = false } = req.body;
   try {
     let response;
@@ -1501,43 +652,7 @@ export async function sendContactVcard(req: Request, res: Response) {
   }
 }
 
-export async function sendMute(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-    #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              phone: { type: "string" },
-              isGroup: { type: "boolean" },
-              time: { type: "number" },
-              type: { type: "string" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                phone: "5521999999999",
-                isGroup: false,
-                time: 1,
-                type: 'hours',
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function sendMute(req: Request, res: any) {
   const { phone, time, type = 'hours', isGroup = false } = req.body;
 
   try {
@@ -1555,39 +670,7 @@ export async function sendMute(req: Request, res: Response) {
   }
 }
 
-export async function sendSeen(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              phone: { type: "string" },
-              isGroup: { type: "boolean" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                phone: "5521999999999",
-                isGroup: false,
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function sendSeen(req: Request, res: any) {
   const { phone } = req.body;
   const session = req.session;
 
@@ -1602,42 +685,7 @@ export async function sendSeen(req: Request, res: Response) {
   }
 }
 
-export async function setChatState(req: Request, res: Response) {
-  /**
-     #swagger.deprecated=true
-     #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              phone: { type: "string" },
-              isGroup: { type: "boolean" },
-              chatstate: { type: "string" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                phone: "5521999999999",
-                isGroup: false,
-                chatstate: "1",
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function setChatState(req: Request, res: any) {
   const { phone, chatstate, isGroup = false } = req.body;
 
   try {
@@ -1657,41 +705,7 @@ export async function setChatState(req: Request, res: Response) {
   }
 }
 
-export async function setTemporaryMessages(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              phone: { type: "string" },
-              isGroup: { type: "boolean" },
-              value: { type: "boolean" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                phone: "5521999999999",
-                isGroup: false,
-                value: true,
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function setTemporaryMessages(req: Request, res: any) {
   const { phone, value = true, isGroup = false } = req.body;
 
   try {
@@ -1711,41 +725,7 @@ export async function setTemporaryMessages(req: Request, res: Response) {
   }
 }
 
-export async function setTyping(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              phone: { type: "string" },
-              isGroup: { type: "boolean" },
-              value: { type: "boolean" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                phone: "5521999999999",
-                isGroup: false,
-                value: true,
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function setTyping(req: Request, res: any) {
   const { phone, value = true, isGroup = false } = req.body;
   try {
     let response;
@@ -1763,44 +743,7 @@ export async function setTyping(req: Request, res: Response) {
   }
 }
 
-export async function setRecording(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              phone: { type: "string" },
-              isGroup: { type: "boolean" },
-              duration: { type: "number" },
-              value: { type: "boolean" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                phone: "5521999999999",
-                isGroup: false,
-                duration: 5,
-                value: true,
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function setRecording(req: Request, res: any) {
   const { phone, value = true, duration, isGroup = false } = req.body;
   try {
     let response;
@@ -1820,20 +763,7 @@ export async function setRecording(req: Request, res: Response) {
   }
 }
 
-export async function checkNumberStatus(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Misc"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["phone"] = {
-      schema: '5521999999999'
-     }
-   */
+export async function checkNumberStatus(req: Request, res: any) {
   const { phone } = req.params;
   try {
     let response;
@@ -1852,20 +782,7 @@ export async function checkNumberStatus(req: Request, res: Response) {
   }
 }
 
-export async function getContact(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["phone"] = {
-      schema: '5521999999999'
-     }
-   */
+export async function getContact(req: Request, res: any) {
   const { phone = true } = req.params;
   try {
     let response;
@@ -1882,17 +799,7 @@ export async function getContact(req: Request, res: Response) {
   }
 }
 
-export async function getAllContacts(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Contact"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-   */
+export async function getAllContacts(req: Request, res: any) {
   try {
     const response = await req.client.getAllContacts();
 
@@ -1907,21 +814,7 @@ export async function getAllContacts(req: Request, res: Response) {
   }
 }
 
-export async function getNumberProfile(req: Request, res: Response) {
-  /**
-     #swagger.deprecated=true
-     #swagger.tags = ["Chat"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["phone"] = {
-      schema: '5521999999999'
-     }
-   */
+export async function getNumberProfile(req: Request, res: any) {
   const { phone = true } = req.params;
   try {
     let response;
@@ -1940,25 +833,11 @@ export async function getNumberProfile(req: Request, res: Response) {
   }
 }
 
-export async function getProfilePicFromServer(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Contact"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["phone"] = {
-      schema: '5521999999999'
-     }
-   */
+export async function getProfilePicFromServer(req: Request, res: any) {
   const { phone = true } = req.params;
-  const { isGroup = false } = req.query;
   try {
     let response;
-    for (const contato of contactToArray(phone as string, isGroup as boolean)) {
+    for (const contato of contactToArray(phone as string, false)) {
       response = await req.client.getProfilePicFromServer(contato);
     }
 
@@ -1973,20 +852,7 @@ export async function getProfilePicFromServer(req: Request, res: Response) {
   }
 }
 
-export async function getStatus(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Contact"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["phone"] = {
-      schema: '5521999999999'
-     }
-   */
+export async function getStatus(req: Request, res: any) {
   const { phone = true } = req.params;
   try {
     let response;
@@ -2002,44 +868,7 @@ export async function getStatus(req: Request, res: Response) {
   }
 }
 
-export async function setProfileStatus(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Profile"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["obj"] = {
-      in: 'body',
-      schema: {
-        $status: 'My new status',
-      }
-     }
-     
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              status: { type: "string" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                status: "My new status",
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function setProfileStatus(req: Request, res: any) {
   const { status } = req.body;
   try {
     const response = await req.client.setProfileStatus(status);
@@ -2052,38 +881,7 @@ export async function setProfileStatus(req: Request, res: Response) {
       .json({ status: 'error', message: 'Error on set profile status' });
   }
 }
-export async function rejectCall(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Misc"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              callId: { type: "string" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                callId: "<callid>",
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function rejectCall(req: Request, res: any) {
   const { callId } = req.body;
   try {
     const response = await req.client.rejectCall(callId);
@@ -2097,39 +895,7 @@ export async function rejectCall(req: Request, res: Response) {
   }
 }
 
-export async function starMessage(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              messageId: { type: "string" },
-              star: { type: "boolean" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                messageId: "5521999999999",
-                star: true,
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function starMessage(req: Request, res: any) {
   const { messageId, star = true } = req.body;
   try {
     const response = await req.client.starMessage(messageId, star);
@@ -2145,20 +911,7 @@ export async function starMessage(req: Request, res: Response) {
   }
 }
 
-export async function getReactions(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["messageId"] = {
-      schema: '<messageId>'
-     }
-   */
+export async function getReactions(req: Request, res: any) {
   const messageId = req.params.id;
   try {
     const response = await req.client.getReactions(messageId);
@@ -2174,20 +927,7 @@ export async function getReactions(req: Request, res: Response) {
   }
 }
 
-export async function getVotes(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Messages"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["messageId"] = {
-      schema: '<messageId>'
-     }
-   */
+export async function getVotes(req: Request, res: any) {
   const messageId = req.params.id;
   try {
     const response = await req.client.getVotes(messageId);
@@ -2200,40 +940,7 @@ export async function getVotes(req: Request, res: Response) {
       .json({ status: 'error', message: 'Error on get votes', error: error });
   }
 }
-export async function chatWoot(req: Request, res: Response) {
-  /**
-     #swagger.tags = ["Misc"]
-     #swagger.description = 'You can point your Chatwoot to this route so that it can perform functions.'
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.requestBody = {
-      required: true,
-      "@content": {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              event: { type: "string" },
-              private: { type: "string" },
-            }
-          },
-          examples: {
-            "Default": {
-              value: {
-                messageId: "conversation_status_changed",
-                private: "false",
-              }
-            },
-          }
-        }
-      }
-     }
-   */
+export async function chatWoot(req: Request, res: any) {
   const { session } = req.params;
   const client: any = clientsArray[session];
   if (client == null || client.status !== 'CONNECTED') return;
@@ -2287,34 +994,6 @@ export async function chatWoot(req: Request, res: Response) {
     return res.status(400).json({
       status: 'error',
       message: 'Error on  receive chatwoot',
-      error: e,
-    });
-  }
-}
-export async function getPlatformFromMessage(req: Request, res: Response) {
-  /**
-   * #swagger.tags = ["Misc"]
-     #swagger.autoBody=false
-     #swagger.security = [{
-            "bearerAuth": []
-     }]
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.parameters["messageId"] = {
-      schema: '<messageId>'
-     }
-   */
-  try {
-    const result = await req.client.getPlatformFromMessage(
-      req.params.messageId
-    );
-    return res.status(200).json(result);
-  } catch (e) {
-    req.logger.error(e);
-    return res.status(500).json({
-      status: 'error',
-      message: 'Error on get get platform from message',
       error: e,
     });
   }

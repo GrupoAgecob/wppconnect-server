@@ -14,24 +14,12 @@
  * limitations under the License.
  */
 import bcrypt from 'bcrypt';
-import { Request, Response } from 'express';
+
+import { Request } from '../types/Request';
 
 const saltRounds = 10;
 
-export async function encryptSession(
-  req: Request,
-  res: Response
-): Promise<any> {
-  /**
-   * #swagger.tags = ['Auth']
-   * #swagger.parameters['secretkey'] = {
-       schema: 'THISISMYSECURETOKEN',
-     }
-     #swagger.parameters["session"] = {
-      schema: 'NERDWHATS_AMERICA'
-     }
-     #swagger.autoHeaders = false
-   */
+export async function encryptSession(req: Request, res: any): Promise<any> {
   const { session, secretkey } = req.params;
   const { authorization: token } = req.headers;
   const secureTokenEnv = req.serverOptions.secretKey;
